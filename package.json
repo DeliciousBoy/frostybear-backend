@@ -1,0 +1,8 @@
+{
+  "name": "frostybear-backend",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
