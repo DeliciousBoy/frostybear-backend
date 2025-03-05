@@ -1,0 +1,16 @@
+name: Create .env File
+on: [workflow_dispatch]
+
+jobs:
+  generate-env:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Create .env file
+        run: |
+          touch .env
+          echo "API_KEY=${{ secrets.API_KEY }}" >> .env
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> .env
