@@ -7,9 +7,8 @@
   <img alt="NPM Version" src="https://img.shields.io/npm/v/express">
 </p>
 <p align="center">
-  <img alt="Static Badge" src="https://img.shields.io/badge/PostgreSQL-red?style=flat&logo=postgresql&logoColor=white&labelColor=gray">
-  <img alt="Static Badge" src="https://img.shields.io/badge/Vue.js-green?style=flat&logo=vuedotjs&logoColor=white&labelColor=gray">
-  <img alt="Static Badge" src="https://img.shields.io/badge/tailwindcss-blue?style=flat&logo=tailwindcss&logoColor=white&labelColor=gray">
+  <img alt="Static Badge" src="https://img.shields.io/badge/express-red?style=flat&logo=npm&logoColor=white&labelColor=gray">
+
 </p>
 <div align="center">
   <p align="justify">
