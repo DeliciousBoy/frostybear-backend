@@ -6,4 +6,6 @@ const router = express.Router()
 
 router.get('/products', productC.getAllProduct)
 
+router.get('/trends/products', productC.getTrendProduct)
+
 export default router
