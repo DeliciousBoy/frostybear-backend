@@ -14,6 +14,18 @@
     "/products": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "product_type_name",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "brand_name",
+            "in": "query",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
