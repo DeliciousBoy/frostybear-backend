@@ -39,51 +39,30 @@
     },
     "/register": {
       "post": {
-        "summary": "Create a new member",
-        "description": "This endpoint allows you to create a new member.",
+        "description": "",
         "parameters": [
           {
             "name": "body",
             "in": "body",
-            "required": true,
             "schema": {
               "type": "object",
               "properties": {
                 "username": {
-                  "type": "string"
+                  "example": "any"
                 },
                 "password": {
-                  "type": "string"
+                  "example": "any"
                 }
-              },
-              "required": ["username", "password"]
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "Member created successfully",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "username": {
-                  "type": "string"
-                },
-                "password": {
-                  "type": "string"
-                },
-                "regist": {
-                  "type": "boolean"
-                },
-                "createDate": {
-                  "type": "string",
-                  "format": "date-time"
-                }
-              }
-            }
+            "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Bad Request"
           }
         }
       }

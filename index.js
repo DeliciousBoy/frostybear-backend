@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 
 import productRoute from './routes/productRoute.js'
-// import memberRoute from './routes/memberRoute.js'
+import memberRoute from './routes/memberRoute.js'
 // import cartRoute from './routes/cartRoute.js'
 
 // import ส่วนที่ติดตั้งเข้ามา
@@ -28,7 +28,7 @@ app.use(cors({
 }))
 
 app.use(productRoute)
-// app.use(memberRoute)
+app.use(memberRoute)
 // app.use(cartRoute)
 
 /* ใช้ swaggerAutogen แบบไม่ต้องเขียนใหม่แบบ Yaml แต่สร้าง API ไรใหม่ต้องคอยใช้คำสั่ง node config/swagger.js ใน Terminal */
