@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import productRoute from './routes/productRoute.js'
 import memberRoute from './routes/memberRoute.js'
 // import cartRoute from './routes/cartRoute.js'
+import systemparamRoute from './routes/systemparamRoute.js'
 
 // import ส่วนที่ติดตั้งเข้ามา
 import swaggerUI from "swagger-ui-express"
@@ -29,6 +30,7 @@ app.use(cors({
 
 app.use(productRoute)
 app.use(memberRoute)
+app.use(systemparamRoute)
 // app.use(cartRoute)
 
 /* ใช้ swaggerAutogen แบบไม่ต้องเขียนใหม่แบบ Yaml แต่สร้าง API ไรใหม่ต้องคอยใช้คำสั่ง node config/swagger.js ใน Terminal */
