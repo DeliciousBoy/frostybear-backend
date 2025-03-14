@@ -79,6 +79,41 @@
         }
       }
     },
+    "/login": {
+      "post": {
+      "description": "User login",
+      "parameters": [
+        {
+        "name": "body",
+        "in": "body",
+        "schema": {
+          "type": "object",
+          "properties": {
+          "username": {
+            "type": "string",
+            "example": "user"
+          },
+          "password": {
+            "type": "string",
+            "example": "pass"
+          }
+          }
+        }
+        }
+      ],
+      "responses": {
+        "200": {
+        "description": "OK"
+        },
+        "400": {
+        "description": "Bad Request"
+        },
+        "401": {
+        "description": "Unauthorized"
+        }
+      }
+      }
+    },
     "/systemparam": {
       "get": {
         "description": "",

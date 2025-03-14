@@ -5,5 +5,6 @@ import * as memberC from "../controllers/memberController.js";
 const router = express.Router();
 
 router.post('/register', memberC.createMember);
+router.post('/login', memberC.loginMember);
 
 export default router;
