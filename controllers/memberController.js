@@ -7,7 +7,10 @@ import multer from "multer";
 export const createMember = async (req, res) => {
   try {
     if (req.body.username == null || req.body.password == null) {
-      return res.status(400).json({ message: "Please fill in all fields" });
+      return res.json({
+        registration: false,
+        message: "Please fill in all fields" 
+      });
     }
 
     const exitsUser = await database.query({
@@ -16,7 +19,9 @@ export const createMember = async (req, res) => {
     });
 
     if (exitsUser.rows.length > 0) {
-      return res.status(400).json({ message: "Username already exists" });
+      return res.json({ 
+        registration: false,
+        message: "Username already exists" });
     }
 
     const username = req.body.username;
@@ -30,11 +35,14 @@ export const createMember = async (req, res) => {
     });
 
     const bodyData = result.rows[0];
-    bodyData.regist = true;
+    bodyData.registration = true;
     bodyData.createDate = new Date();
     res.json(bodyData);
   } catch (error) {
-    console.log(error);
+    return res.json({
+      registration: false,
+      message: error.message,
+    });
   }
 };
 
@@ -79,4 +87,8 @@ export async function loginMember(req, res) {
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
+}
+
+export async function logout(req, res){
+
 }
