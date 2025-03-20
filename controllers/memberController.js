@@ -9,7 +9,7 @@ export const createMember = async (req, res) => {
     if (req.body.username == null || req.body.password == null) {
       return res.json({
         registration: false,
-        message: "Please fill in all fields" 
+        message: "Please fill in all fields",
       });
     }
 
@@ -19,9 +19,10 @@ export const createMember = async (req, res) => {
     });
 
     if (exitsUser.rows.length > 0) {
-      return res.json({ 
+      return res.json({
         registration: false,
-        message: "Username already exists" });
+        message: "Username already exists",
+      });
     }
 
     const username = req.body.username;
@@ -50,20 +51,36 @@ export async function loginMember(req, res) {
   console.log(`loginMember is requested`);
   try {
     if (req.body.username == null || req.body.password == null) {
-      return res.status(400).json({ message: "Please fill in all fields" });
+      return res.json({
+        login: false,
+        message: "Please fill in all fields",
+      });
     }
 
     const exitsUser = await database.query({
-      text: `SELECT * FROM users WHERE username = $1`,
+      text: `SELECT EXISTS (SELECT * FROM users WHERE username = $1)`,
       values: [req.body.username],
     });
+    // console.log("member exits", exitsUser.rows[0].exists);
 
-    if (exitsUser.rows.length === 0) {
-      return res.status(400).json({ message: "Username not exists" });
+    if (!exitsUser.rows[0].exists) {
+      return res.json({
+        login: false,
+        message: "Username not exists",
+      });
     }
 
-    const user = exitsUser.rows[0];
-    const validPassword = await bcrypt.compare(req.body.password, user.password);
+    const result = await database.query({
+      text: "SELECT * FROM users WHERE username = $1",
+      values: [req.body.username],
+    });
+    // console.log("result", result.rows[0]);
+
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      result.rows[0].password
+    );
+    // console.log("password is valid:", validPassword)
 
     if (!validPassword) {
       res.clearCookie("token", {
@@ -72,23 +89,25 @@ export async function loginMember(req, res) {
       });
       return res.json({ login: false });
     } else {
-      const token = jwt.sign({ id: user.id }, process.env.TOKEN_SECRET, {
-        expiresIn: "1h",
-      });
 
+      const theuser = {
+        username: result.rows[0].username,
+        password: result.rows[0].password,
+      };
+      // console.log(theuser);
+      const secret_key = process.env.SECRET_KEY;
+      const token = jwt.sign(theuser, secret_key, { expiresIn: "1h" });
+      
       res.cookie("token", token, {
         maxAge: 3600000,
         secure: true,
         sameSite: "none",
       });
-
       res.json({ login: true });
     }
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.json({ message: error.message });
   }
 }
 
-export async function logout(req, res){
-
-}
+export async function logout(req, res) {}
