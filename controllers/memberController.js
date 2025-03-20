@@ -89,7 +89,6 @@ export async function loginMember(req, res) {
       });
       return res.json({ login: false });
     } else {
-
       const theuser = {
         username: result.rows[0].username,
         password: result.rows[0].password,
@@ -97,7 +96,7 @@ export async function loginMember(req, res) {
       // console.log(theuser);
       const secret_key = process.env.SECRET_KEY;
       const token = jwt.sign(theuser, secret_key, { expiresIn: "1h" });
-      
+
       res.cookie("token", token, {
         maxAge: 3600000,
         secure: true,
@@ -110,4 +109,14 @@ export async function loginMember(req, res) {
   }
 }
 
-export async function logout(req, res) {}
+export async function logoutMember(req, res) {
+  try {
+    res.clearCookie("token", {
+      secure: true,
+      sameSite: "none",
+    });
+    res.json({ logout: true });
+  } catch (error) {
+    return res.json({ logout: false });
+  }
+}
