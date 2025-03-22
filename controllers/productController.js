@@ -116,3 +116,84 @@ export async function getAllProduct(req, res) {
     });
   }
 }
+
+export async function putProduct(req, res) {
+  console.log(`PUT /productsById id=${req.params.id} is Requested`);
+
+  try {
+    const result = await database.query({
+      text: `
+                    UPDATE products SET
+                                 "product_id"=$1,
+                                 "product_image"=$2,
+                                 "product_name"=$3,
+                                 "product_detail"=$4,
+                                 "product_price"=$5,
+                                 "brand_id"=$6,
+                                 "product_type"=$7
+
+                    WHERE "product_id"=$8
+                    `,
+      values: [
+        req.body.product_id,
+        req.body.product_image,
+        req.body.product_name,
+        req.body.product_detail,
+        req.body.product_price,
+        req.body.brand_id,
+        req.body.product_type,
+        req.params.id,
+      ],
+    });
+
+    if (result.rowCount == 0) {
+      return res.status(404).json({ error: `id ${req.params.id} not found` });
+    }
+
+    const bodyData = req.body;
+
+    return res.status(201).json(bodyData);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function postProduct(req, res) {
+  console.log(`POST /products is requested`);
+  try {
+    if (req.body.product_id == null || req.body.product_name == null) {
+      return res.status(422).json({ error: "pdId and pdName required" });
+    }
+
+    const existResult = await database.query({
+      text: `SELECT EXISTS (SELECT * FROM products WHERE "product_id" = $1)`,
+      values: [req.body.product_id],
+    });
+
+    if (existResult.rows[0].exists) {
+      return res
+        .status(409)
+        .json({ error: `Product ${req.body.product_id} already exists` });
+    }
+
+    const result = await database.query({
+      text: ` INSERT INTO products ("product_id","product_image", "product_name", "product_detail", "product_price","brand_id","product_type")
+                      VALUES($1, $2, $3, $4, $5, $6, $7)`,
+      values: [
+        req.body.product_id,
+        req.body.product_image,
+        req.body.product_name,
+        req.body.product_detail,
+        req.body.product_price,
+        req.body.brand_id,
+        req.body.product_type,
+      ],
+    });
+
+    const bodyData = req.body;
+    res.status(201).json(bodyData);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
