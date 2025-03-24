@@ -164,6 +164,17 @@ export async function postProduct(req, res) {
   try {
     if (!req.body.product_name) {
       return res.status(422).json({ error: "Product name is required" });
+
+    }
+    const existResult = await database.query({
+      text: `SELECT EXISTS (SELECT * FROM products WHERE "product_name" = $1)`,
+      values: [req.body.product_name],
+    });
+
+    if (existResult.rows[0].exists) {
+      return res
+        .status(409)
+        .json({ error: `Product ${req.body.product_name} already exists` });
     }
 
     // ดึงค่า product_id อัตโนมัติจาก SEQUENCE
