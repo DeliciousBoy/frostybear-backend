@@ -162,36 +162,32 @@ export async function putProduct(req, res) {
 export async function postProduct(req, res) {
   console.log(`POST /products is requested`);
   try {
-    if (req.body.product_name == null) {
-      return res.status(422).json({ error: "pdName required" });
+    if (!req.body.product_name) {
+      return res.status(422).json({ error: "Product name is required" });
     }
 
-    const existResult = await database.query({
-      text: `SELECT EXISTS (SELECT * FROM products WHERE "product_name" = $1)`,
-      values: [req.body.product_name],
+    // ดึงค่า product_id อัตโนมัติจาก SEQUENCE
+    const idResult = await database.query({
+      text: `SELECT LPAD(nextval('product_id_seq')::TEXT, 3, '0') AS new_id;`
     });
+    const productId = idResult.rows[0].new_id; // ได้ค่า product_id ใหม่ เช่น '022'
 
-    if (existResult.rows[0].exists) {
-      return res
-        .status(409)
-        .json({ error: `Product ${req.body.product_name} already exists` });
-    }
-
-    const result = await database.query({
-      text: ` INSERT INTO products ("product_image", "product_name", "product_detail", "product_price","brand_id","product_type")
-                      VALUES($1, $2, $3, $4, $5, $6)`,
+    // บันทึกข้อมูลสินค้า
+    await database.query({
+      text: `INSERT INTO products ("product_id", "product_image", "product_name", "product_detail", "product_price", "brand_id", "product_type")
+             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       values: [
-        req.body.product_image,
+        productId,
+        req.body.product_image || null,
         req.body.product_name,
-        req.body.product_detail,
-        req.body.product_price,
-        req.body.brand_id,
-        req.body.product_type,
+        req.body.product_detail || null,
+        req.body.product_price || null,
+        req.body.brand_id || null,
+        req.body.product_type || null,
       ],
     });
 
-    const bodyData = req.body;
-    res.status(201).json(bodyData);
+    res.status(201).json({ product_id: productId, ...req.body });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
