@@ -162,26 +162,25 @@ export async function putProduct(req, res) {
 export async function postProduct(req, res) {
   console.log(`POST /products is requested`);
   try {
-    if (req.body.product_id == null || req.body.product_name == null) {
-      return res.status(422).json({ error: "pdId and pdName required" });
+    if (req.body.product_name == null) {
+      return res.status(422).json({ error: "pdName required" });
     }
 
     const existResult = await database.query({
-      text: `SELECT EXISTS (SELECT * FROM products WHERE "product_id" = $1)`,
-      values: [req.body.product_id],
+      text: `SELECT EXISTS (SELECT * FROM products WHERE "product_name" = $1)`,
+      values: [req.body.product_name],
     });
 
     if (existResult.rows[0].exists) {
       return res
         .status(409)
-        .json({ error: `Product ${req.body.product_id} already exists` });
+        .json({ error: `Product ${req.body.product_name} already exists` });
     }
 
     const result = await database.query({
-      text: ` INSERT INTO products ("product_id","product_image", "product_name", "product_detail", "product_price","brand_id","product_type")
-                      VALUES($1, $2, $3, $4, $5, $6, $7)`,
+      text: ` INSERT INTO products ("product_image", "product_name", "product_detail", "product_price","brand_id","product_type")
+                      VALUES($1, $2, $3, $4, $5, $6)`,
       values: [
-        req.body.product_id,
         req.body.product_image,
         req.body.product_name,
         req.body.product_detail,
