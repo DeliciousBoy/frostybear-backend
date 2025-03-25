@@ -203,3 +203,26 @@ export async function postProduct(req, res) {
     return res.status(500).json({ error: err.message });
   }
 }
+
+export async function deleteProduct(req, res) {
+  console.log(`DELETE /products id=${req.params.id} is Requested`);
+
+  try {
+    const result = await database.query({
+      text: `
+                    DELETE FROM "products"
+                    WHERE "product_id"=$1
+                    `,
+      values: [req.params.id],
+    });
+
+    if (result.rowCount == 0) {
+      return res.status(404).json({ error: `id ${req.params.id} not found` });
+    }
+
+    return res.status(204).end();
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}

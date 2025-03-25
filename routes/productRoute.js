@@ -8,5 +8,6 @@ router.get('/products', productC.getAllProduct)
 router.get('/trends/products', productC.getTrendProduct)
 router.post('/products', productC.postProduct)
 router.put('/products/:id', productC.putProduct)
+router.delete('/products/:id', productC.deleteProduct)
 
 export default router
