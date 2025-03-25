@@ -45,14 +45,14 @@ export const createMember = async (req, res) => {
       message: error.message,
     });
   }
-};
+}
 
 export async function loginMember(req, res) {
   console.log(`loginMember is requested`);
   try {
     if (req.body.username == null || req.body.password == null) {
       return res.json({
-        login: false,
+        loginStatus: false,
         message: "Please fill in all fields",
       });
     }
@@ -65,7 +65,7 @@ export async function loginMember(req, res) {
 
     if (!exitsUser.rows[0].exists) {
       return res.json({
-        login: false,
+        loginStatus: false,
         message: "Username not exists",
       });
     }
@@ -87,11 +87,12 @@ export async function loginMember(req, res) {
         secure: true,
         sameSite: "none",
       });
-      return res.json({ login: false });
+      return res.json({ loginStatus: false });
     } else {
       const theuser = {
         username: result.rows[0].username,
         password: result.rows[0].password,
+        role: result.rows[0].role,
       };
       // console.log(theuser);
       const secret_key = process.env.SECRET_KEY;
@@ -102,10 +103,76 @@ export async function loginMember(req, res) {
         secure: true,
         sameSite: "none",
       });
-      res.json({ login: true });
+      res.json({ loginStatus: true });
     }
   } catch (error) {
     return res.json({ message: error.message });
+  }
+}
+
+export async function updateMember(req, res) {
+  try {
+    const { username, password } = req.body;
+
+    if (!username && !password) {
+      return res.json({
+        update: false,
+        message: "Please provide data to update",
+      });
+    }
+
+    const token = req.cookies.token;
+    if (!token) {
+      return res.json({
+        update: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const secret_key = process.env.SECRET_KEY;
+    const decoded = jwt.verify(token, secret_key);
+
+    const updates = [];
+    const values = [];
+    let index = 1;
+
+    if (username) {
+      updates.push(`username = $${index++}`);
+      values.push(username);
+    }
+
+    if (password) {
+      const salt = 11;
+      const passwordHash = await bcrypt.hash(password, salt);
+      updates.push(`password = $${index++}`);
+      values.push(passwordHash);
+    }
+
+    values.push(decoded.username);
+
+    const query = {
+      text: `UPDATE users SET ${updates.join(", ")} WHERE username = $${index} RETURNING *`,
+      values: values,
+    };
+
+    const result = await database.query(query);
+
+    if (result.rows.length === 0) {
+      return res.json({
+        update: false,
+        message: "User not found",
+      });
+    }
+
+    res.json({
+      update: true,
+      data: result.rows[0],
+    });
+  } catch (error) {
+    return res.json({
+      update: false,
+      message: error.message,
+    });
   }
 }
 
