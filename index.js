@@ -10,7 +10,6 @@ import systemparamRoute from './routes/systemparamRoute.js'
 
 // import ส่วนที่ติดตั้งเข้ามา
 import swaggerUI from "swagger-ui-express"
-import yaml from "yaml"
 // ใช้ File
 import fs from "fs"
 
@@ -20,7 +19,7 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT;
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '10mb' }));
 
 app.use(cors({
   origin:['http://localhost:5173','http://127.0.0.1:5173'], //Domain ของ Frontend
@@ -46,10 +45,6 @@ swaggerDoc = JSON.parse(swaggerfile);
 
 app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDoc));
 
-
-app.use("/img_pd", express.static("img_pd"))
-
-// app.use("/img_mem", express.static("img_mem"))
 
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);
