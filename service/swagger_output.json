@@ -34,6 +34,52 @@
             "description": "Internal Server Error"
           }
         }
+      },
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "product_name": {
+                  "example": "any"
+                },
+                "product_image": {
+                  "example": "any"
+                },
+                "product_detail": {
+                  "example": "any"
+                },
+                "product_price": {
+                  "example": "any"
+                },
+                "brand_id": {
+                  "example": "any"
+                },
+                "product_type": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "409": {
+            "description": "Conflict"
+          },
+          "422": {
+            "description": "Unprocessable Entity"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
       }
     },
     "/trends/products": {
@@ -42,6 +88,82 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/products/{id}": {
+      "put": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "product_id": {
+                  "example": "any"
+                },
+                "product_image": {
+                  "example": "any"
+                },
+                "product_name": {
+                  "example": "any"
+                },
+                "product_detail": {
+                  "example": "any"
+                },
+                "product_price": {
+                  "example": "any"
+                },
+                "brand_id": {
+                  "example": "any"
+                },
+                "product_type": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"
@@ -72,46 +194,72 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request"
           }
         }
       }
     },
     "/login": {
       "post": {
-      "description": "User login",
-      "parameters": [
-        {
-        "name": "body",
-        "in": "body",
-        "schema": {
-          "type": "object",
-          "properties": {
-          "username": {
-            "type": "string",
-            "example": "user"
-          },
-          "password": {
-            "type": "string",
-            "example": "pass"
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
-        }
-        }
-      ],
-      "responses": {
-        "200": {
-        "description": "OK"
-        },
-        "400": {
-        "description": "Bad Request"
-        },
-        "401": {
-        "description": "Unauthorized"
         }
       }
+    },
+    "/logout": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/update": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "example": "any"
+                },
+                "password": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
       }
     },
     "/systemparam": {
