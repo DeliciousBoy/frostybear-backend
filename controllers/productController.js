@@ -226,3 +226,42 @@ export async function deleteProduct(req, res) {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 }
+
+
+export async function getProductById(req, res) {
+  console.log(`GET /products/${req.params.id} request`);
+  try {
+    const query = `
+   SELECT p.*, 
+                (
+                    SELECT row_to_json(brand_obj)
+                    FROM (
+                        SELECT brand_id, brand_name FROM brands
+                        WHERE brand_id = p.brand_id
+                    ) brand_obj
+                ) AS brand,
+                (
+                    SELECT row_to_json(pdt_obj)
+                    FROM (
+                        SELECT product_type_id, product_type_name
+                        FROM product_types
+                        WHERE product_type_id = p.product_type
+                    ) pdt_obj
+                ) AS pdt
+            FROM products p
+            WHERE p.product_id = $1
+        `;
+
+    const result = await database.query(query, [req.params.id]);
+
+    if (result.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ error: `pdId ${req.params.id} does not exist` });
+    }
+
+    return res.status(200).json(result.rows);
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
