@@ -8,23 +8,6 @@ const doc = {
   host: "localhost:3000",
   schemes: ["http"],
   definitions: {
-    cart_details: {
-      type: "object",
-      properties: {
-        cart_id: { type: "string" },
-        product_id: { type: "string" },
-        quantity: { type: "number" },
-        price: { type: "number" }
-      }
-    },
-    carts: {
-      type: "object",
-      properties: {
-        cart_id: { type: "string" },
-        customer_id: { type: "string" },
-        card_date: { type: "string", format: "date" }
-      }
-    },
     product_types: {
       type: "object",
       properties: {
@@ -51,7 +34,11 @@ const doc = {
         product_detail: { type: "string" },
         product_price: { type: "number" },
         brand_id: { type: "string" },
-        product_type: { type: "string" }
+        product_type: { type: "string" },
+        create_date: { type: "string", format: "date-time" },
+        update_date: { type: "string", format: "date-time" },
+        create_by: { type: "string" },
+        update_by: { type: "string" }
       }
     },
     brands: {
@@ -70,13 +57,39 @@ const doc = {
         byte_name: { type: "string" },
         byte_code: { type: "string" }
       }
+    },
+    carts: {
+      type: "object",
+      properties: {
+        cartId: { type: "string" },
+        cusId: { type: "string" },
+        cartDate: { type: "string", format: "date" },
+        cartCf: { type: "boolean" }
+      }
+    },
+    cartDtl: {
+      type: "object",
+      properties: {
+        cartId: { type: "string" },
+        pdId: { type: "string" },
+        qty: { type: "number" },
+        price: { type: "number" }
+      }
+    }
+  },
+  securityDefinitions: {
+    BearerAuth: {
+      type: "apiKey",
+      name: "Authorization",
+      in: "header",
+      description: "JWT authorization using the Bearer scheme. Example: 'Bearer {token}'"
     }
   }
 };
 
-const outputFile = "./service/swagger_output.json"; // กำหนด path ของ output
-const endpointsFiles = ["./index.js"]; // ไฟล์หลักของ Express.js
+const outputFile = "./service/swagger_output.json";
+const endpointsFiles = ["./index.js"];
 
 swaggerAutogen()(outputFile, endpointsFiles, doc).then(() => {
-  console.log("Swagger JSON generated successfully!");
+  console.log("Swagger documentation generated successfully!");
 });

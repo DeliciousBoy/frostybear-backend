@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 
 import productRoute from './routes/productRoute.js'
 import memberRoute from './routes/memberRoute.js'
+import cartRoute from './routes/cartRoute.js'
 // import cartRoute from './routes/cartRoute.js'
 import systemparamRoute from './routes/systemparamRoute.js'
 
@@ -29,6 +30,7 @@ app.use(cors({
 
 app.use(productRoute)
 app.use(memberRoute)
+app.use(cartRoute)
 app.use(systemparamRoute)
 // app.use(cartRoute)
 
