@@ -45,7 +45,7 @@ export const createMember = async (req, res) => {
       message: error.message,
     });
   }
-}
+};
 
 export async function loginMember(req, res) {
   console.log(`loginMember is requested`);
@@ -152,7 +152,9 @@ export async function updateMember(req, res) {
     values.push(decoded.username);
 
     const query = {
-      text: `UPDATE users SET ${updates.join(", ")} WHERE username = $${index} RETURNING *`,
+      text: `UPDATE users SET ${updates.join(
+        ", "
+      )} WHERE username = $${index} RETURNING *`,
       values: values,
     };
 
@@ -186,5 +188,57 @@ export async function logoutMember(req, res) {
     res.json({ logout: true });
   } catch (error) {
     return res.json({ logout: false });
+  }
+}
+
+export async function putusername(req, res) {
+  console.log(`PUT /username id=${req.params.id} is Requested`);
+
+  try {
+    const result = await database.query({
+      text: `
+          UPDATE users 
+            SET "username"=$1
+          WHERE "id"=$2
+           `,
+      values: [req.body.username, req.params.id],
+    });
+
+    if (result.rowCount == 0) {
+      return res.status(404).json({ error: `id ${req.params.id} not found` });
+    }
+
+    const bodyData = req.body;
+
+    return res.status(201).json(bodyData);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
+export async function putpassword(req, res) {
+  console.log(`PUT /password id=${req.params.id} is Requested`);
+
+  try {
+    const result = await database.query({
+      text: `
+          UPDATE users 
+            SET "password"=$1
+          WHERE "id"=$2
+           `,
+      values: [req.body.password, req.params.id],
+    });
+
+    if (result.rowCount == 0) {
+      return res.status(404).json({ error: `id ${req.params.id} not found` });
+    }
+
+    const bodyData = req.body;
+
+    return res.status(201).json(bodyData);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 }
