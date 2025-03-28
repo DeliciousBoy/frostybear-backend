@@ -256,39 +256,3 @@ export async function confirmCart(req, res) {
       });
   }
 }
-
-// // ใน cartController.js
-// export async function getCurrentCart(req, res) {
-//   try {
-//     if (!req.user?.username) {
-//       return res.status(401).json({ success: false, message: "Unauthorized" });
-//     }
-
-//     // หาตะกร้าที่ยังไม่ยืนยันล่าสุดของลูกค้า
-//     const result = await database.query({
-//       text: `SELECT * FROM carts 
-//              WHERE "cusId" = $1 AND "cartCf" = false
-//              ORDER BY "cartDate" DESC 
-//              LIMIT 1`,
-//       values: [req.user.username]
-//     });
-
-//     if (result.rows.length > 0) {
-//       return res.json({ 
-//         success: true,
-//         cartId: result.rows[0].cartId
-//       });
-//     } else {
-//       return res.json({ 
-//         success: true,
-//         cartId: null 
-//       });
-//     }
-//   } catch (err) {
-//     console.error("Error getting current cart:", err);
-//     return res.status(500).json({ 
-//       success: false, 
-//       message: "Failed to get current cart" 
-//     });
-//   }
-// }
