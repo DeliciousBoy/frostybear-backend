@@ -4,45 +4,87 @@ import database from "../service/database.js";
 
 const imageFolder = path.join("public", "img");
 
+// export async function getTrendProduct(req, res) {
+//   console.log(`GET /products request`);
+//   try {
+//     const result = await database.query(`
+//                                 SELECT p.*,(
+//                                             SELECT row_to_json(brand_obj)
+//                                             FROM
+//                                             (
+//                                             SELECT brand_id, brand_name FROM brands
+//                                             WHERE brand_id = p.brand_id
+//                                                 )brand_obj
+//                                             ) AS brand,
+//                                             (
+//                                             SELECT row_to_json(pdt_obj)
+//                                             FROM
+//                                             (
+//                                             SELECT product_type_id,product_type_name
+//                                             FROM product_types
+//                                             WHERE product_type_id = p.product_type
+//                                             )pdt_obj
+//                                             )AS pdt
+//                                 FROM products p
+// 								                LIMIT 4;`);
+
+//     // const files = fs.readdirSync(imageFolder);
+
+//     // const images = files.map((file) => {
+//     //   const filePath = path.join(imageFolder, file);
+//     //   const fileData = fs.readFileSync(filePath);
+//     //   const base64Image = fileData.toString("base64");
+//     //   return {
+//     //     fileName: file,
+//     //     base64: base64Image,
+//     //   };
+//     // });
+
+//     return res.status(200).json({
+//       products: result.rows,
+//       // images: images,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({
+//       error: err.message,
+//     });
+//   }
+// }
+
 export async function getTrendProduct(req, res) {
-  console.log(`GET /products request`);
+  console.log(`GET /trending-products request`);
   try {
     const result = await database.query(`
-                                SELECT p.*,(
-                                            SELECT row_to_json(brand_obj)
-                                            FROM
-                                            (
-                                            SELECT brand_id, brand_name FROM brands
-                                            WHERE brand_id = p.brand_id
-                                                )brand_obj
-                                            ) AS brand,
-                                            (
-                                            SELECT row_to_json(pdt_obj)
-                                            FROM
-                                            (
-                                            SELECT product_type_id,product_type_name
-                                            FROM product_types
-                                            WHERE product_type_id = p.product_type
-                                            )pdt_obj
-                                            )AS pdt
-                                FROM products p
-								                LIMIT 4;`);
-
-    // const files = fs.readdirSync(imageFolder);
-
-    // const images = files.map((file) => {
-    //   const filePath = path.join(imageFolder, file);
-    //   const fileData = fs.readFileSync(filePath);
-    //   const base64Image = fileData.toString("base64");
-    //   return {
-    //     fileName: file,
-    //     base64: base64Image,
-    //   };
-    // });
+      SELECT 
+        p.*,
+        (
+          SELECT row_to_json(brand_obj)
+          FROM (
+            SELECT brand_id, brand_name 
+            FROM brands
+            WHERE brand_id = p.brand_id
+          ) brand_obj
+        ) AS brand,
+        (
+          SELECT row_to_json(pdt_obj)
+          FROM (
+            SELECT product_type_id, product_type_name
+            FROM product_types
+            WHERE product_type_id = p.product_type
+          ) pdt_obj
+        ) AS pdt,
+        SUM(cd.qty) AS total_sold
+      FROM products p
+      JOIN "cartDtl" cd ON p.product_id = cd."pdId"
+      JOIN carts c ON cd."cartId" = c."cartId"
+      WHERE c."cartCf" = true
+      GROUP BY p.product_id, p.brand_id, p.product_type
+      ORDER BY total_sold DESC
+      LIMIT 4;
+    `);
 
     return res.status(200).json({
       products: result.rows,
-      // images: images,
     });
   } catch (err) {
     return res.status(500).json({
