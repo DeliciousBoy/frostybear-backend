@@ -195,6 +195,25 @@ export async function putusername(req, res) {
   console.log(`PUT /username id=${req.params.id} is Requested`);
 
   try {
+    if (req.body.username == null || req.body.username == "") {
+      return res.json({
+        updated: false,
+        message: "username can't be null",
+      });
+    }
+
+    const exitsUser = await database.query({
+      text: "SELECT * FROM users WHERE username = $1",
+      values: [req.body.username],
+    });
+
+    if (exitsUser.rows.length > 0) {
+      return res.json({
+        updated: false,
+        message: "Username already exists",
+      });
+    }
+
     const result = await database.query({
       text: `
           UPDATE users 
@@ -204,8 +223,10 @@ export async function putusername(req, res) {
       values: [req.body.username, req.params.id],
     });
 
-    if (result.rowCount == 0) {
-      return res.status(404).json({ error: `id ${req.params.id} not found` });
+    if (result.rows.length > 0) {
+      return res.json({
+        error: `id ${req.params.id} not found`,
+      });
     }
 
     const bodyData = req.body;
@@ -213,7 +234,7 @@ export async function putusername(req, res) {
     return res.status(201).json(bodyData);
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.json({ message: "Internal Server Error" });
   }
 }
 
