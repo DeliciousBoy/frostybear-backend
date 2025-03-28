@@ -90,6 +90,7 @@ export async function loginMember(req, res) {
       return res.json({ loginStatus: false });
     } else {
       const theuser = {
+        id: result.rows[0].id,
         username: result.rows[0].username,
         password: result.rows[0].password,
         role: result.rows[0].role,
