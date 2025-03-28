@@ -78,7 +78,6 @@ export async function getAllProduct(req, res) {
           WHERE product_type_id = p.product_type
         ) pdt_obj
       ) pdt ON true
-       ORDER BY update_date DESC
     `;
 
     // เพิ่มเงื่อนไข WHERE ตามพารามิเตอร์ที่ส่งมา
@@ -105,6 +104,8 @@ export async function getAllProduct(req, res) {
     if (conditions.length > 0) {
       query += ` WHERE ${conditions.join(' AND ')}`;
     }
+
+    query += ` ORDER BY p.update_date DESC`;
 
     const result = await database.query(query, params);
 
