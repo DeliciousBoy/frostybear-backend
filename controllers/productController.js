@@ -78,6 +78,7 @@ export async function getAllProduct(req, res) {
           WHERE product_type_id = p.product_type
         ) pdt_obj
       ) pdt ON true
+       ORDER BY update_date DESC
     `;
 
     // เพิ่มเงื่อนไข WHERE ตามพารามิเตอร์ที่ส่งมา
@@ -121,19 +122,28 @@ export async function putProduct(req, res) {
   console.log(`PUT /productsById id=${req.params.id} is Requested`);
 
   try {
+    // ตรวจสอบว่ามี username ใน cookies หรือไม่
+    if (!req.body.update_by) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const currentUser = req.body.update_by;
+    const currentDate = new Date().toISOString();
+
     const result = await database.query({
       text: `
-                    UPDATE products SET
-                                 "product_id"=$1,
-                                 "product_image"=$2,
-                                 "product_name"=$3,
-                                 "product_detail"=$4,
-                                 "product_price"=$5,
-                                 "brand_id"=$6,
-                                 "product_type"=$7
-
-                    WHERE "product_id"=$8
-                    `,
+        UPDATE products SET
+          "product_id"=$1,
+          "product_image"=$2,
+          "product_name"=$3,
+          "product_detail"=$4,
+          "product_price"=$5,
+          "brand_id"=$6,
+          "product_type"=$7,
+          "update_date"=$8,
+          "update_by"=$9
+        WHERE "product_id"=$10
+      `,
       values: [
         req.body.product_id,
         req.body.product_image,
@@ -142,7 +152,9 @@ export async function putProduct(req, res) {
         req.body.product_price,
         req.body.brand_id,
         req.body.product_type,
-        req.params.id,
+        currentDate,  // update_date
+        currentUser,  // update_by
+        req.params.id
       ],
     });
 
@@ -150,9 +162,13 @@ export async function putProduct(req, res) {
       return res.status(404).json({ error: `id ${req.params.id} not found` });
     }
 
-    const bodyData = req.body;
+    const responseData = {
+      ...req.body,
+      update_date: currentDate,
+      update_by: currentUser
+    };
 
-    return res.status(201).json(bodyData);
+    return res.status(200).json(responseData);
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -162,10 +178,20 @@ export async function putProduct(req, res) {
 export async function postProduct(req, res) {
   console.log(`POST /products is requested`);
   try {
+    // ตรวจสอบข้อมูลที่จำเป็น
     if (!req.body.product_name) {
       return res.status(422).json({ error: "Product name is required" });
-
     }
+
+    // ตรวจสอบว่ามี username ใน cookies หรือไม่
+    if (!req.body.create_by) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    const currentUser = req.body.create_by;
+    const currentDate = new Date().toISOString(); // วันที่และเวลาปัจจุบันในรูปแบบ ISO
+
+    // ตรวจสอบว่าสินค้ามีอยู่แล้วหรือไม่
     const existResult = await database.query({
       text: `SELECT EXISTS (SELECT * FROM products WHERE "product_name" = $1)`,
       values: [req.body.product_name],
@@ -181,12 +207,21 @@ export async function postProduct(req, res) {
     const idResult = await database.query({
       text: `SELECT LPAD(nextval('product_id_seq')::TEXT, 3, '0') AS new_id;`
     });
-    const productId = idResult.rows[0].new_id; // ได้ค่า product_id ใหม่ เช่น '022'
+    const productId = idResult.rows[0].new_id;
 
     // บันทึกข้อมูลสินค้า
     await database.query({
-      text: `INSERT INTO products ("product_id", "product_image", "product_name", "product_detail", "product_price", "brand_id", "product_type")
-             VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      text: `INSERT INTO products (
+              "product_id", 
+              "product_image", 
+              "product_name", 
+              "product_detail", 
+              "product_price", 
+              "brand_id", 
+              "product_type", 
+              "create_date", 
+              "create_by"
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       values: [
         productId,
         req.body.product_image || null,
@@ -195,10 +230,17 @@ export async function postProduct(req, res) {
         req.body.product_price || null,
         req.body.brand_id || null,
         req.body.product_type || null,
+        currentDate, // create_date
+        currentUser, // create_by
       ],
     });
 
-    res.status(201).json({ product_id: productId, ...req.body });
+    res.status(201).json({ 
+      product_id: productId, 
+      ...req.body,
+      create_date: currentDate,
+      create_by: currentUser,
+    });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
