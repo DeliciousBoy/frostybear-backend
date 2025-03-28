@@ -11,4 +11,5 @@ router.post('/update', memberC.updateMember);
 router.put('/putusername/:id', memberC.putusername);
 router.put('/putpassword/:id',memberC.putpassword);
 
+
 export default router;

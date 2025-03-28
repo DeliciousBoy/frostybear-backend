@@ -219,6 +219,8 @@ export async function putusername(req, res) {
 
 export async function putpassword(req, res) {
   console.log(`PUT /password id=${req.params.id} is Requested`);
+  const salt = 11;
+  const passwordHash = await bcrypt.hash(req.body.password, salt);
 
   try {
     const result = await database.query({
@@ -227,7 +229,7 @@ export async function putpassword(req, res) {
             SET "password"=$1
           WHERE "id"=$2
            `,
-      values: [req.body.password, req.params.id],
+      values: [passwordHash, req.params.id],
     });
 
     if (result.rowCount == 0) {
